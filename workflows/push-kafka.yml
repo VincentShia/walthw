@@ -1,0 +1,21 @@
+name: Push Kafka Image to ACR
+
+on:
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull, tag and push
+        env:
+          ACR_REGISTRY: crpi-wyhltlc3mlbgd5zz.cn-shenzhen.personal.cr.aliyuncs.com
+          ACR_NAMESPACE: walthw
+          ACR_REPO: kafka_resp
+        run: |
+          docker pull bitnami/kafka:3.7.1
+          docker tag bitnami/kafka:3.7.1 \
+            $ACR_REGISTRY/$ACR_NAMESPACE/$ACR_REPO:3.7.1
+          docker login -u "$DOCKER_USER" -p "$DOCKER_PASS" $ACR_REGISTRY
+          docker push $ACR_REGISTRY/$ACR_NAMESPACE/$ACR_REPO:3.7.1
+        env_KEYS: [DOES_NOT_EXIST_PLACEHOLDER]
