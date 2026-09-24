@@ -1,0 +1,23 @@
+name: Push Kafka Image to ACR
+
+on:
+  workflow_dispatch:
+
+env:
+  ACR_REGISTRY: crpi-wyhltlc3mlbgd5zz.cn-shenzhen.personal.cr.aliyuncs.com
+  ACR_NAMESPACE: walthw
+  ACR_REPO: kafka_resp
+  IMAGE_TAG: "3.7.1"
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull, tag and push to ACR
+        run: |
+          docker pull bitnami/kafka:${IMAGE_TAG}
+          docker tag bitnami/kafka:${IMAGE_TAG} \
+            ${ACR_REGISTRY}/${ACR_NAMESPACE}/${ACR_REPO}:${IMAGE_TAG}
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login \
+            -u "${{ secrets.ACR_USERNAME }}" --password-stdin ${ACR_REGISTRY}
+          docker push ${ACR_REGISTRY}/${ACR_NAMESPACE}/${ACR_REPO}:${IMAGE_TAG}
